@@ -1,0 +1,9 @@
+let
+    Source = expand,
+    #"Erreurs remplacées" = Table.ReplaceErrorValues(Source, {{"Départ Dieppe", null}, {"Arrivée NH", null}, {"Départ NH", null}, {"Arrivée Dieppe", null}}),
+    #"Colonnes supprimées" = Table.RemoveColumns(#"Erreurs remplacées",{"Départ Dieppe", "Arrivée NH"}),
+    #"Lignes filtrées" = Table.SelectRows(#"Colonnes supprimées", each ([Arrivée Dieppe] <> null)),
+    Personnalisé2 = Table.AddColumn(#"Lignes filtrées", "trajet", each "NH-Dieppe"),
+    #"Colonnes renommées" = Table.RenameColumns(Personnalisé2,{{"Départ NH", "Départ"}})
+in
+    #"Colonnes renommées"
