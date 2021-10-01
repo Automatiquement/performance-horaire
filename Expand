@@ -1,0 +1,29 @@
+let 
+
+    Source = #"filtre les feuilles", 
+
+    #"Erreurs supprimées" = Table.RemoveRowsWithErrors(Source, {"fct_filtre"}), 
+
+    #"fct_filtre développé" = Table.ExpandTableColumn(#"Erreurs supprimées", "fct_filtre", {"Column1", "DEPART", "ARRIVEE", "DEPART_1", "ARRIVEE_2", "Navire"}, {"Column1", "DEPART", "ARRIVEE", "DEPART_1", "ARRIVEE_2", "Navire"}), 
+
+    #"Texte extrait entre les délimiteurs" = Table.TransformColumns(#"fct_filtre développé", {{"Name", each Text.BetweenDelimiters(_, " ", " "), type text}}), 
+
+    #"Type modifié" = Table.TransformColumnTypes(#"Texte extrait entre les délimiteurs",{{"Name", Int64.Type}, {"Column1", type date}, {"DEPART", type time}, {"ARRIVEE", type time}, {"DEPART_1", type time}, {"ARRIVEE_2", type time}, {"Navire", type text}}), 
+
+    #"Départ Dieppe" = Table.AddColumn(#"Type modifié", "Départ Dieppe", each [Column1] & [DEPART], type datetime), 
+
+    #"Arrivée NH" = Table.AddColumn(#"Départ Dieppe", "Arrivée NH", each if [DEPART]="23:59:00" then ([Column1]+1) & [ARRIVEE] else([Column1]+1)&[ARRIVEE]), 
+
+    #"Départ NH" = Table.AddColumn(#"Arrivée NH", "Départ NH", each [Column1] & [DEPART_1], type datetime), 
+
+    #"Arrivée Dieppe" = Table.AddColumn(#"Départ NH", "Arrivée Dieppe", each [Column1] & [ARRIVEE_2], type datetime), 
+
+    #"Colonnes supprimées" = Table.RemoveColumns(#"Arrivée Dieppe",{"Column1", "DEPART", "ARRIVEE", "DEPART_1", "ARRIVEE_2"}), 
+
+    #"Colonnes permutées" = Table.ReorderColumns(#"Colonnes supprimées",{"Name", "Départ Dieppe", "Arrivée NH", "Départ NH", "Arrivée Dieppe", "Navire"}), 
+
+    #"Index ajouté" = Table.AddIndexColumn(#"Colonnes permutées", "Index", 1, 1, Int64.Type) 
+
+in 
+
+    #"Index ajouté" 
