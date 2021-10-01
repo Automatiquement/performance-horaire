@@ -1,0 +1,13 @@
+let Traverses=(ou)=>
+
+
+
+let
+    Source = Excel.Workbook(File.Contents(ou), null, true),
+    Data_DefinedName = Source{[Item="Data",Kind="DefinedName"]}[Data],
+    #"En-têtes promus" = Table.PromoteHeaders(Data_DefinedName, [PromoteAllScalars=true]),
+    #"Type modifié" = Table.TransformColumnTypes(#"En-têtes promus",{{"Unit Name", type text}, {"Departure date and time", type datetime}, {"Departure Port Name", type text}, {"Arrival Date and Time", type datetime}, {"Arrival Port Name", type text}, {"Voyage Report No.", type text}, {"Wind Direction", type text}, {"Wind Force", type text}, {"Distance Departure to Arrival", Int64.Type}, {"Total AUX Consumption", type number}, {"Total Boiler Consumption", Int64.Type}, {"Total ME Consumption", type number}, {"General Remarks", type text}, {"Consumption kg/Nm Calculated", type number}, {"Sea State", type text}, {"Start of sea passage", type any}, {"End of sea passage", type datetime}})
+in
+    #"Type modifié"
+
+    in Traverses
