@@ -9,11 +9,13 @@ let
     #"Texte extrait entre les délimiteurs" = Table.TransformColumns(#"fct_filtre développé", {{"Name", each Text.BetweenDelimiters(_, " ", " "), type text}}), 
 
     #"Type modifié" = Table.TransformColumnTypes(#"Texte extrait entre les délimiteurs",{{"Name", Int64.Type}, {"Column1", type date}, {"DEPART", type time}, {"ARRIVEE", type time}, {"DEPART_1", type time}, {"ARRIVEE_2", type time}, {"Navire", type text}}), 
-
+    
+    #"supprime Date vide" = Table.SelectRows(#"Type modifié", each ([Column1] <> null)), 
+    
     #"Départ Dieppe" = Table.AddColumn(#"Type modifié", "Départ Dieppe", each [Column1] & [DEPART], type datetime), 
 
-    #"Arrivée NH" = Table.AddColumn(#"Départ Dieppe", "Arrivée NH", each if [DEPART]="23:59:00" then ([Column1]+1) & [ARRIVEE] else([Column1]+1)&[ARRIVEE]), 
-
+    #"Arrivée NH" = Table.AddColumn(#"Départ Dieppe", "Arrivée NH", each if [DEPART] <> #time(23, 59, 0) then ([Column1] & [DEPART]) else ( Date.AddDays([Column1] , 1) & [DEPART]), type datetime), 
+   
     #"Départ NH" = Table.AddColumn(#"Arrivée NH", "Départ NH", each [Column1] & [DEPART_1], type datetime), 
 
     #"Arrivée Dieppe" = Table.AddColumn(#"Départ NH", "Arrivée Dieppe", each [Column1] & [ARRIVEE_2], type datetime), 
