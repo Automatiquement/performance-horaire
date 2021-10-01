@@ -1,0 +1,13 @@
+let
+    Source = target_Weeks,
+    #"Personnalisé développé" = Table.ExpandTableColumn(Source, "Personnalisé", { "Departure date and time", "Departure Port Name", "Arrival Date and Time", "Arrival Port Name", "Voyage Report No.", "Wind Direction", "Wind Force", "Distance Departure to Arrival", "General Remarks", "Sea State", "Start of sea passage", "End of sea passage"}, { "Departure date and time", "Departure Port Name", "Arrival Date and Time", "Arrival Port Name", "Voyage Report No.", "Wind Direction", "Wind Force", "Distance Departure to Arrival", "General Remarks", "Sea State", "Start of sea passage", "End of sea passage"}),
+    #"Texte extrait avant le délimiteur" = Table.TransformColumns(#"Personnalisé développé", {{"Wind Force", each Text.BeforeDelimiter(_, " ("), type text}}),
+    #"Texte extrait avant le délimiteur1" = Table.TransformColumns(#"Texte extrait avant le délimiteur", {{"Sea State", each Text.BeforeDelimiter(_, " ("), type text}}),
+    #"Autres colonnes supprimées" = Table.SelectColumns(#"Texte extrait avant le délimiteur1",{"Voyage Report No.", "Wind Force", "Sea State", "General Remarks", "Departure date and time", "Arrival Date and Time","Arrival Port Name", "Start of sea passage", "End of sea passage"}),
+    #"Colonnes permutées" = Table.ReorderColumns(#"Autres colonnes supprimées",{"Voyage Report No.", "Sea State", "Wind Force", "General Remarks", "Departure date and time", "Arrival Date and Time", "Start of sea passage", "End of sea passage"}),
+    #"Personnalisée ajoutée" = Table.AddColumn(#"Colonnes permutées", "Man.Dept.", each [Start of sea passage]-[Departure date and time]),
+    #"Erreurs remplacées" = Table.ReplaceErrorValues(#"Personnalisée ajoutée", {{"Man.Dept.", null}}),
+    #"Personnalisée ajoutée1" = Table.AddColumn(#"Erreurs remplacées", "Man.Arv.", each [Arrival Date and Time]-[End of sea passage]),
+    #"Colonnes supprimées" = Table.RemoveColumns(#"Personnalisée ajoutée1",{"Start of sea passage", "End of sea passage"})
+in
+    #"Colonnes supprimées"
