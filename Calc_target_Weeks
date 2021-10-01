@@ -1,0 +1,7 @@
+let
+    Source = Folder.Files("M:\Exploitation\EP1\TRANSMANCHE\03-Infos pour rapport mensuel\01 - ligne\2021\Semaines du 30-34 [août]"),
+    #"Colonnes supprimées" = Table.RemoveColumns(Source,{"Content", "Extension", "Date accessed", "Date modified", "Date created", "Attributes"}),
+    #"Lignes filtrées" = Table.SelectRows(#"Colonnes supprimées", each Text.Contains([Name], "CALB SSIS")),
+    #"Personnalisée ajoutée" = Table.AddColumn(#"Lignes filtrées", "Personnalisé", each traversés([Folder Path]&[Name]))
+in
+    #"Personnalisée ajoutée"
